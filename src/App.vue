@@ -102,7 +102,11 @@ export default {
       }
     },
     format(tag) {
-      document.execCommand("formatBlock", false, `<${tag}>`);
+      // تعديل النص باستخدام range و selection
+      const selection = window.getSelection();
+      const range = selection.getRangeAt(0);
+      const newNode = document.createElement(tag);
+      range.surroundContents(newNode);
       this.saveHistory();
     },
     insertImage() {
@@ -111,7 +115,8 @@ export default {
         const img = document.createElement('img');
         img.src = imageUrl;
         img.alt = 'Inserted Image';
-        this.$refs.editor.appendChild(img);
+        const editor = this.$refs.editor;
+        editor.appendChild(img);
         this.saveHistory();
       }
     },
@@ -124,8 +129,10 @@ export default {
   },
   mounted() {
     this.saveHistory();
-    this.$refs.editor.addEventListener("input", this.saveHistory);
-  },
+    this.$nextTick(() => {
+      this.$refs.editor.addEventListener("input", this.saveHistory);
+    });
+  }
 };
 </script>
 
@@ -138,17 +145,20 @@ body {
   justify-content: center;
   height: 200vh;
 }
+
 .editor-container {
-  padding: 20px;
+  padding-top: 20px;
   display: flex;
   flex-direction: column;
 }
+
 .toolbar {
   display: flex;
   gap: 10px;
   align-items: center;
   padding-left: 10px;
 }
+
 .toolbar button {
   padding: 10px;
   border: none;
@@ -163,9 +173,11 @@ body {
   align-items: center;
   justify-content: center;
 }
+
 .toolbar button:hover {
   background-color: #0056b3;
 }
+
 .editor {
   padding: 10px;
   display: flex;
@@ -173,6 +185,7 @@ body {
   justify-content: center;
   gap: 20px;
 }
+
 .editor p {
   font-family: Roboto;
   font-size: 15px;
@@ -184,6 +197,7 @@ body {
   width: 621px;
   height: 253px;
 }
+
 .editor p:nth-of-type(2) {
   font-family: Roboto;
   font-size: 15px;
@@ -193,12 +207,80 @@ body {
   text-underline-position: from-font;
   text-decoration-skip-ink: none;
 }
+
 .editor p:nth-of-type(3) {
   padding: 10px;
 }
+
 .large-text {
   font-size: 20px;
   line-height: 28px;
   margin-bottom: 30px;
 }
+
+
+@media (max-width: 768px) {
+  .editor p {
+    font-size: 14px; 
+    line-height: 20px; 
+    width: auto; 
+  }
+
+  .editor p:nth-of-type(2) {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .editor p:nth-of-type(3) {
+    font-size: 14px;
+    line-height: 20px;
+    padding: 8px; 
+  }
+
+  .toolbar button {
+    width: 35px; 
+    height: 32px; 
+  }
+
+  .large-text {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .editor p {
+    font-size: 12px; 
+    line-height: 18px;
+    width: auto;
+  }
+
+  .editor p:nth-of-type(2) {
+    font-size: 12px;
+    line-height: 18px;
+  }
+
+  .editor p:nth-of-type(3) {
+    font-size: 12px;
+    line-height: 18px;
+    padding: 5px; 
+  }
+
+  .toolbar button {
+    width: 30px; 
+    height: 28px; 
+  }
+
+  .large-text {
+    font-size: 16px; 
+  }
+}
+
+
+@media (max-width: 768px) {
+  .editor img {
+    width: 100%; 
+    height: auto;
+  }
+}
+
 </style>
